@@ -11,6 +11,18 @@ final mysql:Client dbClient = check new(
     database = "meal_management"
 );
 
+    @http:ServiceConfig {
+    cors: {
+        allowOrigins: ["http://localhost:5173"],
+        allowHeaders: ["REQUEST_ID", "Content-Type"],
+        exposeHeaders: ["RESPONSE_ID"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        maxAge: 84900
+    }
+}
+
+
+
 service /api on new http:Listener(9090) {
 
      // Sign in (Login)
@@ -154,61 +166,62 @@ service /api on new http:Listener(9090) {
         return employees;
     }
 
-    // Get order count for each mealtime and meal type
-    resource function get orderCounts(http:Caller caller) returns error? {
-        map<json> result = {};
-        
-        stream<OrderCountRecord, sql:Error?> countStream = dbClient->query(
-            `SELECT o.mealtimeId, o.mealtypeId, COUNT(*) as count 
-            FROM Order1 o 
-            GROUP BY o.mealtimeId, o.mealtypeId`
-        );
-
-        map<json> mealCounts = {};
-        check from OrderCountRecord countRec in countStream
-            do {
-                mealCounts[countRec.mealtypeId.toString()] = countRec.count;
-                result[countRec.mealtimeId.toString()] = mealCounts;
-            };
-
-        http:Response res = new;
-        res.setPayload(result);
-        addCorsHeaders(res);
-        check caller->respond(res);
-    }
-
-    // Get order count for a specific date
-    resource function get orderCountsForDate(http:Caller caller, http:Request req, string inputDate) returns error? {
-        map<json> result = {};
-        
-        stream<OrderCountRecord, sql:Error?> countStream = dbClient->query(
-            `SELECT o.mealtimeId, o.mealtypeId, COUNT(*) as count 
-            FROM Order1 o 
-            WHERE o.date = ${inputDate} 
-            GROUP BY o.mealtimeId, o.mealtypeId`
-        );
-
-        map<json> mealCounts = {};
-        check from OrderCountRecord countRec in countStream
-            do {
-                mealCounts[countRec.mealtypeId.toString()] = countRec.count;
-                result[countRec.mealtimeId.toString()] = mealCounts;
-            };
-
-        http:Response res = new;
-        res.setPayload(result);
-        addCorsHeaders(res);
-        check caller->respond(res);
-    }
-
+   // Get order count for a specific date
+resource function get orderCountsForDate(http:Caller caller, http:Request req, string inputDate) returns error? {
+    // Map for mealtime names
+    map<string> mealtimeNames = {
+        "1": "Breakfast",
+        "2": "Lunch",
+        "3": "Dinner"
+    };
+    // Initialize response map
+    map<map<string>> mealTimeCounts = {
+        "Breakfast": { "veg_count": "0", "nonveg_count": "0", "egg_count": "0" },
+        "Lunch": { "veg_count": "0", "nonveg_count": "0", "egg_count": "0" },
+        "Dinner": { "veg_count": "0", "nonveg_count": "0", "egg_count": "0" }
+    };
+    // Stream SQL results
+    stream<OrderCountRecord, sql:Error?> countStream = dbClient->query(
+        `SELECT 
+    c.id AS mealtimeId, 
+    IFNULL(t.id, 0) AS mealtypeId,  -- Replace null values with 0
+    CAST(SUM(CASE WHEN o.id IS NOT NULL THEN 1 ELSE 0 END) AS UNSIGNED) AS count
+FROM 
+    Mealtime c
+LEFT JOIN 
+    Order1 o ON o.mealtimeId = c.id AND o.date = ${inputDate}
+LEFT JOIN 
+    Mealtype t ON o.mealtypeId = t.id
+GROUP BY 
+    c.id, t.id
+ORDER BY 
+    c.id;
+        `
+    );
+    check from OrderCountRecord record1 in countStream
+        do {
+            string? mealtimeName = mealtimeNames[record1.mealtimeId.toString()]; 
+            
+            if mealtimeName is string { 
+                
+                string countStr = record1.count.toString(); 
+                if record1.mealtypeId == 1 { // Veg
+                    mealTimeCounts[mealtimeName]["veg_count"] = countStr;
+                } else if record1.mealtypeId == 2 { // Non-Veg
+                    mealTimeCounts[mealtimeName]["nonveg_count"] = countStr;
+                } else if record1.mealtypeId == 3 { // Egg
+                    mealTimeCounts[mealtimeName]["egg_count"] = countStr;
+                }
+            } else {
+                
+            }
+        };
+   
+    check caller->respond(mealTimeCounts);
+}
 }
 
-// Function to add CORS headers
-function addCorsHeaders(http:Response response) {
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-}
+
 
 // Types
 
