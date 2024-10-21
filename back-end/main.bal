@@ -11,17 +11,6 @@ final mysql:Client dbClient = check new(
     database = "meal_management"
 );
 
-
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["http://localhost:5173"],
-        allowHeaders: ["REQUEST_ID", "Content-Type"],
-        exposeHeaders: ["RESPONSE_ID"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        maxAge: 84900
-    }
-}
-
 service /api on new http:Listener(9090) {
 
      // Sign in (Login)
@@ -57,7 +46,6 @@ service /api on new http:Listener(9090) {
 
             http:Response res = new;
             res.setPayload(userData);
-
             check caller->respond(res);
         } else {
             // Incorrect password
@@ -185,7 +173,7 @@ service /api on new http:Listener(9090) {
 
         http:Response res = new;
         res.setPayload(result);
-    
+        addCorsHeaders(res);
         check caller->respond(res);
     }
 
@@ -209,13 +197,20 @@ service /api on new http:Listener(9090) {
 
         http:Response res = new;
         res.setPayload(result);
-      
+        addCorsHeaders(res);
         check caller->respond(res);
     }
 
 }
 
+// Function to add CORS headers
+function addCorsHeaders(http:Response response) {
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
 
+// Types
 
 public type LoginRequest record {|
     string mail;

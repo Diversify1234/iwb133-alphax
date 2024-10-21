@@ -1,65 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react'
 import TextField from '@mui/material/TextField';
 import SubmitButton from './SubmitButton';
-import "../index.css";
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import  "../index.css";
+
 
 function SigninForm() {
-  const navigate = useNavigate();
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    try {
-      const response = await axios.post('http://localhost:9090/api/signin', {
-        mail: email,
-        password: password
-      });
-
-      if (response.data) {
-      
-        navigate('/employee');
-      }
-    } catch (error) {
-      setError('Invalid email or password. Please try again.');
-    }
-  };
-
   return (
-    <form className='formCss' onSubmit={handleSubmit}>
+    <form className='formCss'>
       <h2 className='headingForm'>
         SignIn
       </h2>
-      
-      {error && <p className="error-message">{error}</p>}
-      
       <TextField
-        label="Email"
+        label="Username"
         variant="outlined"
         fullWidth
         margin="normal"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
       />
-      
       <TextField
         label="Password"
         variant="outlined"
         fullWidth
         margin="normal"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
       />
-      
-      <SubmitButton buttonTitle="Login" />
+      <SubmitButton buttonTitle="Login"></SubmitButton>
     </form>
-  );
+  )
 }
 
-export default SigninForm;
+export default SigninForm
