@@ -7,6 +7,7 @@ import './index.css'
 import Admin from './pages/Admin';
 import Header from './Components/Header';
 import DashboardMain from './pages/DashboardMain.jsx';
+import Orderpage from './pages/Orderpage.jsx';
 import { AuthProvider } from './Context/Authcontext.jsx';
 
 
@@ -25,6 +26,7 @@ const App = () => {
    <Route path="/signin" element={<Signin />} />
    <Route path="/signup" element={<Signup />} />
    <Route path="/dashboard" element={<DashboardMain />} />
+   <Route path="/order" element={<Orderpage />} />
 
     </Routes>
     </AuthProvider>
