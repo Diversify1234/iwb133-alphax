@@ -27,6 +27,31 @@ const OrderPage = () => {
     fetchMealCounts();
   };
 
+  // Calculate totals for all meal types
+  const calculateTotals = () => {
+    if (!mealCounts) return { veg: 0, nonveg: 0, egg: 0 };
+
+    return Object.keys(mealCounts).reduce(
+      (acc, meal) => {
+        acc.veg += parseInt(mealCounts[meal].veg_count) || 0;
+        acc.nonveg += parseInt(mealCounts[meal].nonveg_count) || 0;
+        acc.egg += parseInt(mealCounts[meal].egg_count) || 0;
+        return acc;
+      },
+      { veg: 0, nonveg: 0, egg: 0 }
+    );
+  };
+
+  const calculateMealTotals = (meal) => {
+    return (
+      (parseInt(mealCounts[meal].veg_count) || 0) +
+      (parseInt(mealCounts[meal].nonveg_count) || 0) +
+      (parseInt(mealCounts[meal].egg_count) || 0)
+    );
+  };
+
+  const totals = calculateTotals();
+
   return (
     <div style={{ padding: '20px' }}>
       <Typography variant="h4" gutterBottom>
@@ -46,7 +71,7 @@ const OrderPage = () => {
           style={{ marginRight: '10px' }}
         />
         <Button variant="contained" color="primary" onClick={handleFetchData}>
-          Fetch Data
+          Fetch Orders
         </Button>
       </div>
 
@@ -58,7 +83,7 @@ const OrderPage = () => {
               <Card style={{ padding: '20px', borderRadius: '10px' }}>
                 <CardContent>
                   <Typography variant="h5" gutterBottom>
-                    {meal}
+                    {meal} (Total: {calculateMealTotals(meal)})
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={4}>
@@ -93,6 +118,46 @@ const OrderPage = () => {
               </Card>
             </Grid>
           ))}
+
+          {/* Total Counts */}
+          <Grid item xs={12}>
+            <Card style={{ padding: '20px', borderRadius: '10px' }}>
+              <CardContent>
+                <Typography variant="h5" gutterBottom>
+                  Total Counts
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={4}>
+                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                      <FontAwesomeIcon icon={faCarrot} size="lg" />
+                      <Typography variant="body2">Total Veg</Typography>
+                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
+                        {totals.veg}
+                      </Typography>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                      <FontAwesomeIcon icon={faDrumstickBite} size="lg" />
+                      <Typography variant="body2">Total Non-Veg</Typography>
+                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
+                        {totals.nonveg}
+                      </Typography>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                      <FontAwesomeIcon icon={faEgg} size="lg" />
+                      <Typography variant="body2">Total Egg</Typography>
+                      <Typography variant="h4" style={{ fontWeight: 'bold' }}>
+                        {totals.egg}
+                      </Typography>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       )}
     </div>
