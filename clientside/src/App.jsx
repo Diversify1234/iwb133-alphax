@@ -5,12 +5,18 @@ import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import './index.css'
 import Admin from './pages/Admin';
+import Header from './Components/Header';
+import DashboardMain from './pages/DashboardMain.jsx';
+import { AuthProvider } from './Context/Authcontext.jsx';
 
 
 
 const App = () => {
   return (
     <>
+    <AuthProvider>
+    <Header/>
+    
     <Routes>
     <Route path="/" element={<Signup />} />
    <Route path="/employee" element={<Dashboard />} />
@@ -18,8 +24,10 @@ const App = () => {
  
    <Route path="/signin" element={<Signin />} />
    <Route path="/signup" element={<Signup />} />
+   <Route path="/dashboard" element={<DashboardMain />} />
 
     </Routes>
+    </AuthProvider>
     </>
   )
 }

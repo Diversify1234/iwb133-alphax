@@ -4,9 +4,11 @@ import SubmitButton from './SubmitButton';
 import "../index.css";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../Context/AuthContext';
 
 function SigninForm() {
   const navigate = useNavigate();
+  const { login } = useAuth(); 
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,8 +24,10 @@ function SigninForm() {
       });
 
       if (response.data) {
-     
-        navigate('/employee');
+       
+        const token = response.headers['session-token'];
+        login(response.data, token); 
+        navigate('/dashboard');
       }
     } catch (error) {
       setError('Invalid email or password. Please try again.');

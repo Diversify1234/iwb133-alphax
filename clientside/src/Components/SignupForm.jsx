@@ -24,7 +24,7 @@ function SignupForm() {
       });
 
       if (response.data) {
-        // Redirect to signin after successful signup
+       
         navigate('/signin');
       }
     } catch (error) {
