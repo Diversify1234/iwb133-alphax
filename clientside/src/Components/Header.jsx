@@ -12,7 +12,6 @@ import { AuthContext } from '../Context/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom'; 
 import logout from '../Actions/Logout';
 
-
 const GradientButton = styled(Button)(({ theme }) => ({
   background: 'linear-gradient(45deg, var(--orange) 30%, var(--orange) 30%)',
   borderRadius: 3,
@@ -45,8 +44,10 @@ const Header = () => {
   const handleLogout = async () => {
     await logout(token, clearAuth);
     navigate('/signin'); 
-};
+  };
 
+  // Check if user is admin
+  const isAdmin = user && (user.mail === 'admin@gmail.com' || user.name === 'admin');
 
   return (
     <AppBar position="static" sx={{ backgroundColor: 'var(--background-color)', boxShadow: '0 4px 6px var(--shadow-color)' }}>
@@ -56,9 +57,23 @@ const Header = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'var(--text-primary)' }}>
             MealManager
           </Typography>
-         
+
           {user ? (
             <>
+              {isAdmin && (
+                <>
+                  <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: '15px' }}>
+                    <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
+                      Dashboard
+                    </Typography>
+                  </Link>
+                  <Link to="/orders" style={{ textDecoration: 'none', color: 'inherit', marginRight: '15px' }}>
+                    <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
+                      Orders
+                    </Typography>
+                  </Link>
+                </>
+              )}
               <div>
                 <Typography
                   variant="body1"
@@ -71,23 +86,7 @@ const Header = () => {
                 >
                   {user.name}
                 </Typography>
-                <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={Boolean(anchorEl)}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={handleClose}>Profile</MenuItem>
-                </Menu>
+              
               </div>
               <GradientButton onClick={handleLogout}>Sign Out</GradientButton>
             </>
