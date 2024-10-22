@@ -72,6 +72,11 @@ const Header = () => {
                       Orders
                     </Typography>
                   </Link>
+                  <Link to="/manage-emp" style={{ textDecoration: 'none', color: 'inherit', marginRight: '15px' }}>
+                    <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
+                      Employees
+                    </Typography>
+                  </Link>
                 </>
               )}
               <div>
