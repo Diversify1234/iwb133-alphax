@@ -2,6 +2,7 @@ import ballerina/http;
 import ballerinax/mysql;
 import ballerina/sql;
 import ballerinax/mysql.driver as _;
+import ballerina/uuid;
 
 final mysql:Client dbClient = check new(
     host = "localhost",
@@ -25,49 +26,54 @@ final mysql:Client dbClient = check new(
 
 service /api on new http:Listener(9090) {
 
-     // Sign in (Login)
-    resource function post signin(http:Caller caller, LoginRequest loginRequest) returns error? {
-       
-        sql:ParameterizedQuery selectQuery = `SELECT id, mail, name, password FROM Employee WHERE mail = ${loginRequest.mail}`;
-        
-        stream<Employee, sql:Error?> resultStream = dbClient->query(selectQuery);
 
-       
-        Employee? employee;
-        check from Employee emp in resultStream
-            do {
-                employee = emp;
-            };
-        
-        if employee is () {
-          
-            http:Response res = new;
-            res.statusCode = 404;
-            res.setPayload({message: "User not found"});
-            check caller->respond(res);
-            return;
-        }
+resource function post signin(http:Caller caller, LoginRequest loginRequest) returns error? {
+    sql:ParameterizedQuery selectQuery = `SELECT id, mail, name, password FROM Employee WHERE mail = ${loginRequest.mail}`;
+    stream<Employee, sql:Error?> resultStream = dbClient->query(selectQuery);
 
-      
-        if employee.password == loginRequest.password {
-            // Successful login
-            UserData userData = {
-                id: employee.id,
-                name: employee.name,
-                mail: employee.mail
-            };
+    Employee? employee;
+    check from Employee emp in resultStream do {
+        employee = emp;
+    };
 
-            http:Response res = new;
-            res.setPayload(userData);
-            check caller->respond(res);
-        } else {
-            // Incorrect password
-            http:Response res = new;
-            res.statusCode = 401;
-            res.setPayload({message: "Invalid credentials"});
-            check caller->respond(res);
-        }
+    if employee is () {
+        http:Response res = new;
+        res.statusCode = 404;
+        res.setPayload({message: "User not found"});
+        check caller->respond(res);
+        return;
     }
+
+    if employee.password == loginRequest.password {
+        // Successful login, generate session token
+        string sessionId = uuid:createType1AsString();  // Create a new UUID session ID
+        
+        // Insert the session ID into the Sessions table
+        sql:ParameterizedQuery insertSessionQuery = `INSERT INTO Sessions (employeeId, sessionId) 
+            VALUES (${employee.id}, ${sessionId})`;
+        sql:ExecutionResult _ = check dbClient->execute(insertSessionQuery);  // Discard result
+
+        // Return session ID to the client
+        UserData userData = {
+            id: employee.id,
+            name: employee.name,
+            mail: employee.mail
+        };
+        
+        http:Response res = new;
+        res.addHeader("session-token", sessionId);  // Return the session token as a header
+        res.setPayload(userData);  // Send user data back to the client
+        check caller->respond(res);
+    } else {
+        http:Response res = new;
+        res.statusCode = 401;
+        res.setPayload({message: "Invalid credentials"});
+        check caller->respond(res);
+    }
+}
+
+
+
 
     // Sign up (Register)
     resource function post signup(http:Caller caller, NewEmployee newEmployee) returns error? {
@@ -108,6 +114,26 @@ service /api on new http:Listener(9090) {
             check caller->respond(res);
         }
     }
+
+
+resource function post logout(http:Caller caller, string sessionId) returns error? {
+    // Delete the session using the sessionId
+    sql:ParameterizedQuery deleteSessionQuery = `DELETE FROM Sessions WHERE sessionId = ${sessionId}`;
+    var result = dbClient->execute(deleteSessionQuery);
+    
+    http:Response res = new;
+    if result is sql:ExecutionResult {
+        res.setPayload({message: "Logout successful"});
+    } else {
+        res.statusCode = 500;
+        res.setPayload({message: "Failed to log out"});
+    }
+    check caller->respond(res);
+}
+
+
+
+
 
     // Get all orders
     resource function get orders() returns Order1[] | error {
@@ -225,6 +251,11 @@ ORDER BY
 
 
 // Types
+
+public type MySession object {
+    public string sessionId;
+    
+};
 
 public type LoginRequest record {|
     string mail;
