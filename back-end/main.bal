@@ -52,6 +52,7 @@ service /api on new http:Listener(9090) {
         if employee.password == loginRequest.password {
             // Successful login
             UserData userData = {
+                id: employee.id,
                 name: employee.name,
                 mail: employee.mail
             };
@@ -231,6 +232,7 @@ public type LoginRequest record {|
 |};
 
 public type UserData record {|
+    readonly int id;
     string name;
     string mail;
 |};
