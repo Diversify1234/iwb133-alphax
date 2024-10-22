@@ -193,6 +193,50 @@ resource function post logout(http:Caller caller, string sessionId) returns erro
         return employees;
     }
 
+
+
+// Delete an employee by ID
+resource function delete employees(http:Caller caller, http:Request req) returns error? {
+    // Get the employee ID from the query parameters
+    string? employeeIdStr = req.getQueryParamValue("id");
+    
+    // Check if the employeeId is present and parse it to an integer
+    if employeeIdStr is string {
+        int employeeId = check int:fromString(employeeIdStr); // Convert string to int
+
+        // Parameterized query to delete an employee by ID
+        sql:ParameterizedQuery deleteQuery = `DELETE FROM Employee WHERE id = ${employeeId}`;
+        var result = dbClient->execute(deleteQuery);
+        
+        // Prepare the response
+        http:Response res = new;
+        if result is sql:ExecutionResult {
+            // Check if any row was affected
+            if result.affectedRowCount > 0 {
+                res.setPayload({message: "Employee deleted successfully"});
+            } else {
+                res.statusCode = 404;  // Employee not found
+                res.setPayload({message: "Employee not found"});
+            }
+        } else {
+            res.statusCode = 500;  // Internal server error
+            res.setPayload({message: "Failed to delete employee"});
+        }
+        
+        check caller->respond(res);
+    } else {
+        // If employee ID is not provided
+        http:Response res = new;
+        res.statusCode = 400;  // Bad request
+        res.setPayload({message: "Missing employee ID in query parameters"});
+        check caller->respond(res);
+    }
+}
+
+
+
+
+
    // Get order count for a specific date
 resource function get orderCountsForDate(http:Caller caller, http:Request req, string inputDate) returns error? {
     // Map for mealtime names
