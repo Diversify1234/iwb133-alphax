@@ -197,21 +197,21 @@ resource function post logout(http:Caller caller, string sessionId) returns erro
 
 // Delete an employee by ID
 resource function delete employees(http:Caller caller, http:Request req) returns error? {
-    // Get the employee ID from the query parameters
+   
     string? employeeIdStr = req.getQueryParamValue("id");
     
-    // Check if the employeeId is present and parse it to an integer
+  
     if employeeIdStr is string {
-        int employeeId = check int:fromString(employeeIdStr); // Convert string to int
+        int employeeId = check int:fromString(employeeIdStr);
 
-        // Parameterized query to delete an employee by ID
+        
         sql:ParameterizedQuery deleteQuery = `DELETE FROM Employee WHERE id = ${employeeId}`;
         var result = dbClient->execute(deleteQuery);
         
-        // Prepare the response
+      
         http:Response res = new;
         if result is sql:ExecutionResult {
-            // Check if any row was affected
+         
             if result.affectedRowCount > 0 {
                 res.setPayload({message: "Employee deleted successfully"});
             } else {
@@ -225,7 +225,7 @@ resource function delete employees(http:Caller caller, http:Request req) returns
         
         check caller->respond(res);
     } else {
-        // If employee ID is not provided
+       
         http:Response res = new;
         res.statusCode = 400;  // Bad request
         res.setPayload({message: "Missing employee ID in query parameters"});
@@ -234,6 +234,52 @@ resource function delete employees(http:Caller caller, http:Request req) returns
 }
 
 
+// Get all food items
+resource function get fooditems() returns FoodItem[] | error {
+    FoodItem[] foodItems = [];
+   
+    stream<FoodItem, sql:Error?> foodItemStream = dbClient->query(
+        `SELECT id, foodName, foodType FROM FoodItems`
+    );
+    
+    check from FoodItem foodItem in foodItemStream
+        do {
+            foodItems.push(foodItem);
+        };
+    
+    return foodItems;
+}
+
+// Post a new food item
+resource function post fooditems(http:Caller caller, http:Request req) returns error? {
+    // Parse the request payload as a JSON object
+    json payload = check req.getJsonPayload();
+    
+    // Convert the JSON object to the `FoodItem` type
+    FoodItem newFoodItem = check payload.cloneWithType(FoodItem);
+    
+    // SQL query to insert the new food item into the database
+    sql:ParameterizedQuery insertQuery = `INSERT INTO FoodItems (foodName, foodType) 
+                                          VALUES (${newFoodItem.foodName}, ${newFoodItem.foodType})`;
+    
+    // Execute the insert query
+    var result = dbClient->execute(insertQuery);
+    
+    http:Response res = new;
+    
+    if result is sql:ExecutionResult {
+     
+        res.statusCode = 201; // Created
+        res.setPayload({message: "Food item added successfully"});
+    } else {
+       
+        res.statusCode = 500; // Internal Server Error
+        res.setPayload({message: "Failed to add food item"});
+    }
+    
+   
+    check caller->respond(res);
+}
 
 
 
@@ -340,6 +386,12 @@ public type Order1 record {|
     int mealtypeId;
     int mealtimeId;
     string date;
+|};
+
+public type FoodItem record {|
+    readonly int id?;
+    string foodName;
+    string foodType;
 |};
 
 public type NewOrder1 record {|
