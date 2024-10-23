@@ -5,17 +5,19 @@ import { Button, Card, CardContent, Typography, FormControl, FormLabel, RadioGro
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUtensils, faCoffee, faHamburger } from '@fortawesome/free-solid-svg-icons'; 
 
-const mealOptions = [
-  { id: 1, name: 'Breakfast', icon: <FontAwesomeIcon icon={faCoffee} /> },
-  { id: 2, name: 'Lunch', icon: <FontAwesomeIcon icon={faHamburger} /> },
-  { id: 3, name: 'Dinner', icon: <FontAwesomeIcon icon={faUtensils} /> },
-];
 
 const mealTypes = [
   { id: 1, name: 'Veg' },
   { id: 2, name: 'Non Veg' },
   { id: 3, name: 'Egg' },
 ];
+const mealOptions = [
+  { id: 1, name: 'Breakfast', icon: <FontAwesomeIcon icon={faCoffee} /> },
+  { id: 2, name: 'Lunch', icon: <FontAwesomeIcon icon={faHamburger} /> },
+  { id: 3, name: 'Dinner', icon: <FontAwesomeIcon icon={faUtensils} /> },
+];
+
+
 
 const PlaceOrder = () => {
   const { user } = useAuth();
