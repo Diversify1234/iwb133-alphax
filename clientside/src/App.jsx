@@ -9,7 +9,8 @@ import Header from './Components/Header';
 import DashboardMain from './pages/DashboardMain.jsx';
 import Orderpage from './pages/Orderpage.jsx';
 import ManageEmployees from './pages/ManageEmployees.jsx';
-import { AuthProvider } from './Context/Authcontext.jsx';
+import { AuthProvider } from './Context/AuthContext';
+import { MenuProvider } from './Context/MenuContext';
 
 
 
@@ -17,6 +18,7 @@ import { AuthProvider } from './Context/Authcontext.jsx';
 const App = () => {
   return (
     <>
+    <MenuProvider>
     <AuthProvider>
     <Header/>
     
@@ -33,6 +35,7 @@ const App = () => {
   
     </Routes>
     </AuthProvider>
+    </MenuProvider>
     </>
   )
 }
