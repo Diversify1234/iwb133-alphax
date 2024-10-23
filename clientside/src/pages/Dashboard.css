@@ -1,6 +1,6 @@
 .dashboard{
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
+    grid-template-columns: 2fr 1fr;
     grid-template-areas: "left right";
     height: 100vh;
     background-color: var(--green);
@@ -65,3 +65,8 @@
     border: 1px solid var(--border-color);
 }
 
+
+.order-card{
+
+    width:400px;
+}

@@ -6,6 +6,8 @@ import Card from '../Components/Card'
 import CardSmall from '../Components/CardSmall'
 import {Button} from '@mui/material'
 import '../index.css'
+import Menu from '../Components/Menu'
+import AddMenu from '../Components/AddMenu'
 
 
 
@@ -15,14 +17,13 @@ const Admin = () => {
       <div className='left admin-left'>
           <div className='col1'>
               <div className='col1-top'>
-                 <Card></Card>
+              <AddMenu/>
               </div>
-              <div className='col1-bot'>
-                 <Piechart></Piechart>
-              </div>
+              
           </div>
           <div className='col2'>
-              <CardSmall></CardSmall>
+          <Menu/>
+              
           </div>
       </div>
       <div className='right'>

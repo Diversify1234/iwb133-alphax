@@ -2,6 +2,7 @@ import ballerina/http;
 import ballerinax/mysql;
 import ballerina/sql;
 import ballerinax/mysql.driver as _;
+import ballerina/uuid;
 
 final mysql:Client dbClient = check new(
     host = "localhost",
@@ -11,7 +12,128 @@ final mysql:Client dbClient = check new(
     database = "meal_management"
 );
 
+    @http:ServiceConfig {
+    cors: {
+        allowOrigins: ["http://localhost:5173"],
+        allowHeaders: ["REQUEST_ID", "Content-Type"],
+        exposeHeaders: ["RESPONSE_ID"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        maxAge: 84900
+    }
+}
+
+
+
 service /api on new http:Listener(9090) {
+
+
+resource function post signin(http:Caller caller, LoginRequest loginRequest) returns error? {
+    sql:ParameterizedQuery selectQuery = `SELECT id, mail, name, password FROM Employee WHERE mail = ${loginRequest.mail}`;
+    stream<Employee, sql:Error?> resultStream = dbClient->query(selectQuery);
+
+    Employee? employee;
+    check from Employee emp in resultStream do {
+        employee = emp;
+    };
+
+    if employee is () {
+        http:Response res = new;
+        res.statusCode = 404;
+        res.setPayload({message: "User not found"});
+        check caller->respond(res);
+        return;
+    }
+
+    if employee.password == loginRequest.password {
+        // Successful login, generate session token
+        string sessionId = uuid:createType1AsString();  // Create a new UUID session ID
+        
+        // Insert the session ID into the Sessions table
+        sql:ParameterizedQuery insertSessionQuery = `INSERT INTO Sessions (employeeId, sessionId) 
+            VALUES (${employee.id}, ${sessionId})`;
+        sql:ExecutionResult _ = check dbClient->execute(insertSessionQuery);  // Discard result
+
+        // Return session ID to the client
+        UserData userData = {
+            id: employee.id,
+            name: employee.name,
+            mail: employee.mail
+        };
+        
+        http:Response res = new;
+        res.addHeader("session-token", sessionId);  // Return the session token as a header
+        res.setPayload(userData);  // Send user data back to the client
+        check caller->respond(res);
+    } else {
+        http:Response res = new;
+        res.statusCode = 401;
+        res.setPayload({message: "Invalid credentials"});
+        check caller->respond(res);
+    }
+}
+
+
+
+
+    // Sign up (Register)
+    resource function post signup(http:Caller caller, NewEmployee newEmployee) returns error? {
+      
+        sql:ParameterizedQuery selectQuery = `SELECT id FROM Employee WHERE mail = ${newEmployee.mail}`;
+        
+        stream<Employee, sql:Error?> resultStream = dbClient->query(selectQuery);
+        Employee? existingEmployee;
+        check from Employee emp in resultStream
+            do {
+                existingEmployee = emp;
+            };
+
+        if existingEmployee is Employee {
+          
+            http:Response res = new;
+            res.statusCode = 409;
+            res.setPayload({message: "Email already exists"});
+            check caller->respond(res);
+            return;
+        }
+
+        sql:ParameterizedQuery insertQuery = `INSERT INTO Employee (mail, name, password)
+            VALUES (${newEmployee.mail}, ${newEmployee.name}, ${newEmployee.password})`;
+        var result = dbClient->execute(insertQuery);
+
+        if result is sql:ExecutionResult {
+         
+            http:Response res = new;
+            res.statusCode = 201;
+            res.setPayload({message: "Employee registered successfully"});
+            check caller->respond(res);
+        } else {
+           
+            http:Response res = new;
+            res.statusCode = 500;
+            res.setPayload({message: "Failed to register employee"});
+            check caller->respond(res);
+        }
+    }
+
+
+resource function post logout(http:Caller caller, string sessionId) returns error? {
+    // Delete the session using the sessionId
+    sql:ParameterizedQuery deleteSessionQuery = `DELETE FROM Sessions WHERE sessionId = ${sessionId}`;
+    var result = dbClient->execute(deleteSessionQuery);
+    
+    http:Response res = new;
+    if result is sql:ExecutionResult {
+        res.setPayload({message: "Logout successful"});
+    } else {
+        res.statusCode = 500;
+        res.setPayload({message: "Failed to log out"});
+    }
+    check caller->respond(res);
+}
+
+
+
+
 
     // Get all orders
     resource function get orders() returns Order1[] | error {
@@ -71,63 +193,170 @@ service /api on new http:Listener(9090) {
         return employees;
     }
 
-    // Get order count for each mealtime and meal type
-    resource function get orderCounts(http:Caller caller) returns error? {
-        map<json> result = {};
+
+
+// Delete an employee by ID
+resource function delete employees(http:Caller caller, http:Request req) returns error? {
+   
+    string? employeeIdStr = req.getQueryParamValue("id");
+    
+  
+    if employeeIdStr is string {
+        int employeeId = check int:fromString(employeeIdStr);
+
         
-        stream<OrderCountRecord, sql:Error?> countStream = dbClient->query(
-            `SELECT o.mealtimeId, o.mealtypeId, COUNT(*) as count 
-            FROM Order1 o 
-            GROUP BY o.mealtimeId, o.mealtypeId`
-        );
-
-        map<json> mealCounts = {};
-        check from OrderCountRecord countRec in countStream
-            do {
-                mealCounts[countRec.mealtypeId.toString()] = countRec.count;
-                result[countRec.mealtimeId.toString()] = mealCounts;
-            };
-
+        sql:ParameterizedQuery deleteQuery = `DELETE FROM Employee WHERE id = ${employeeId}`;
+        var result = dbClient->execute(deleteQuery);
+        
+      
         http:Response res = new;
-        res.setPayload(result);
-        addCorsHeaders(res);
+        if result is sql:ExecutionResult {
+         
+            if result.affectedRowCount > 0 {
+                res.setPayload({message: "Employee deleted successfully"});
+            } else {
+                res.statusCode = 404;  // Employee not found
+                res.setPayload({message: "Employee not found"});
+            }
+        } else {
+            res.statusCode = 500;  // Internal server error
+            res.setPayload({message: "Failed to delete employee"});
+        }
+        
+        check caller->respond(res);
+    } else {
+       
+        http:Response res = new;
+        res.statusCode = 400;  // Bad request
+        res.setPayload({message: "Missing employee ID in query parameters"});
         check caller->respond(res);
     }
+}
 
-    // Get order count for a specific date
-    resource function get orderCountsForDate(http:Caller caller, http:Request req, string inputDate) returns error? {
-        map<json> result = {};
-        
-        stream<OrderCountRecord, sql:Error?> countStream = dbClient->query(
-            `SELECT o.mealtimeId, o.mealtypeId, COUNT(*) as count 
-            FROM Order1 o 
-            WHERE o.date = ${inputDate} 
-            GROUP BY o.mealtimeId, o.mealtypeId`
-        );
 
-        map<json> mealCounts = {};
-        check from OrderCountRecord countRec in countStream
-            do {
-                mealCounts[countRec.mealtypeId.toString()] = countRec.count;
-                result[countRec.mealtimeId.toString()] = mealCounts;
-            };
+// Get all food items
+resource function get fooditems() returns FoodItem[] | error {
+    FoodItem[] foodItems = [];
+   
+    stream<FoodItem, sql:Error?> foodItemStream = dbClient->query(
+        `SELECT id, foodName, foodType FROM FoodItems`
+    );
+    
+    check from FoodItem foodItem in foodItemStream
+        do {
+            foodItems.push(foodItem);
+        };
+    
+    return foodItems;
+}
 
-        http:Response res = new;
-        res.setPayload(result);
-        addCorsHeaders(res);
-        check caller->respond(res);
+// Post a new food item
+resource function post fooditems(http:Caller caller, http:Request req) returns error? {
+    // Parse the request payload as a JSON object
+    json payload = check req.getJsonPayload();
+    
+    // Convert the JSON object to the `FoodItem` type
+    FoodItem newFoodItem = check payload.cloneWithType(FoodItem);
+    
+    // SQL query to insert the new food item into the database
+    sql:ParameterizedQuery insertQuery = `INSERT INTO FoodItems (foodName, foodType) 
+                                          VALUES (${newFoodItem.foodName}, ${newFoodItem.foodType})`;
+    
+    // Execute the insert query
+    var result = dbClient->execute(insertQuery);
+    
+    http:Response res = new;
+    
+    if result is sql:ExecutionResult {
+     
+        res.statusCode = 201; // Created
+        res.setPayload({message: "Food item added successfully"});
+    } else {
+       
+        res.statusCode = 500; // Internal Server Error
+        res.setPayload({message: "Failed to add food item"});
     }
-
+    
+   
+    check caller->respond(res);
 }
 
-// Function to add CORS headers
-function addCorsHeaders(http:Response response) {
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+
+   // Get order count for a specific date
+resource function get orderCountsForDate(http:Caller caller, http:Request req, string inputDate) returns error? {
+    // Map for mealtime names
+    map<string> mealtimeNames = {
+        "1": "Breakfast",
+        "2": "Lunch",
+        "3": "Dinner"
+    };
+    // Initialize response map
+    map<map<string>> mealTimeCounts = {
+        "Breakfast": { "veg_count": "0", "nonveg_count": "0", "egg_count": "0" },
+        "Lunch": { "veg_count": "0", "nonveg_count": "0", "egg_count": "0" },
+        "Dinner": { "veg_count": "0", "nonveg_count": "0", "egg_count": "0" }
+    };
+    // Stream SQL results
+    stream<OrderCountRecord, sql:Error?> countStream = dbClient->query(
+        `SELECT 
+    c.id AS mealtimeId, 
+    IFNULL(t.id, 0) AS mealtypeId,  -- Replace null values with 0
+    CAST(SUM(CASE WHEN o.id IS NOT NULL THEN 1 ELSE 0 END) AS UNSIGNED) AS count
+FROM 
+    Mealtime c
+LEFT JOIN 
+    Order1 o ON o.mealtimeId = c.id AND o.date = ${inputDate}
+LEFT JOIN 
+    Mealtype t ON o.mealtypeId = t.id
+GROUP BY 
+    c.id, t.id
+ORDER BY 
+    c.id;
+        `
+    );
+    check from OrderCountRecord record1 in countStream
+        do {
+            string? mealtimeName = mealtimeNames[record1.mealtimeId.toString()]; 
+            
+            if mealtimeName is string { 
+                
+                string countStr = record1.count.toString(); 
+                if record1.mealtypeId == 1 { // Veg
+                    mealTimeCounts[mealtimeName]["veg_count"] = countStr;
+                } else if record1.mealtypeId == 2 { // Non-Veg
+                    mealTimeCounts[mealtimeName]["nonveg_count"] = countStr;
+                } else if record1.mealtypeId == 3 { // Egg
+                    mealTimeCounts[mealtimeName]["egg_count"] = countStr;
+                }
+            } else {
+                
+            }
+        };
+   
+    check caller->respond(mealTimeCounts);
 }
+}
+
+
 
 // Types
+
+public type MySession object {
+    public string sessionId;
+    
+};
+
+public type LoginRequest record {|
+    string mail;
+    string password;
+|};
+
+public type UserData record {|
+    readonly int id;
+    string name;
+    string mail;
+|};
 
 public type Employee record {|
     readonly int id;
@@ -136,6 +365,11 @@ public type Employee record {|
     string password;
 |};
 
+public type NewEmployee record {|
+    string mail;
+    string name;
+    string password;
+|};
 public type Mealtime record {|
     readonly int id;
     string name;
@@ -154,6 +388,12 @@ public type Order1 record {|
     string date;
 |};
 
+public type FoodItem record {|
+    readonly int id?;
+    string foodName;
+    string foodType;
+|};
+
 public type NewOrder1 record {|
     int employeeId;
     int mealtypeId;
@@ -166,11 +406,7 @@ type OrderCreated1 record {|
     Order1 body;
 |};
 
-public type NewEmployee record {|
-    string mail;
-    string name;
-    string password;
-|};
+
 
 type MealCountRecord record {|
     int mealtypeId;

@@ -27,7 +27,7 @@ npm run dev
 
 
 
-### 2. Backend
+## 2. Backend
 
 After setting up the frontend, return to the root directory and start the backend:
 
