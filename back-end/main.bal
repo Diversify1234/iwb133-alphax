@@ -164,6 +164,71 @@ resource function post logout(http:Caller caller, string sessionId) returns erro
         }
     }
 
+    // Delete an order by ID
+resource function delete orders(http:Caller caller, http:Request req) returns error? {
+    
+    string? orderIdStr = req.getQueryParamValue("id");
+
+    if orderIdStr is string {
+        
+        int orderId = check int:fromString(orderIdStr);
+
+        sql:ParameterizedQuery deleteQuery = `DELETE FROM Order1 WHERE id = ${orderId}`;
+        var result = dbClient->execute(deleteQuery);
+
+        http:Response res = new;
+        if result is sql:ExecutionResult {
+            if result.affectedRowCount > 0 {
+                res.setPayload({message: "Order deleted successfully"});
+            } else {
+                res.statusCode = 404;  
+                res.setPayload({message: "Order not found"});
+            }
+        } else {
+            res.statusCode = 500;  
+            res.setPayload({message: "Failed to delete order"});
+        }
+
+      
+        check caller->respond(res);
+    } else {
+    
+        http:Response res = new;
+        res.statusCode = 400;  // Bad request
+        res.setPayload({message: "Missing order ID in query parameters"});
+        check caller->respond(res);
+    }
+}
+
+
+// Get an order by ID
+resource function get orders/[int orderId](http:Caller caller) returns error? {
+
+    
+    sql:ParameterizedQuery selectQuery = `SELECT id, employeeId, mealtypeId, mealtimeId, date 
+                                          FROM Order1 WHERE id = ${orderId}`;
+    stream<Order1, sql:Error?> orderStream = dbClient->query(selectQuery);
+
+    Order1? order1;
+    check from Order1 o in orderStream
+        do {
+            order1 = o;
+        };
+
+   
+    http:Response res = new;
+    if order1 is Order1 {
+        res.setPayload(order1);  
+    } else {
+        res.statusCode = 404;  
+        res.setPayload({message: "Order not found"});
+    }
+
+    
+    check caller->respond(res);
+}
+
+
     // Post a new employee
     resource function post employees(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
