@@ -8,7 +8,8 @@ import Admin from './pages/Admin';
 import Header from './Components/Header';
 import DashboardMain from './pages/DashboardMain.jsx';
 import Orderpage from './pages/Orderpage.jsx';
-import ManageEmployees from './pages/ManageEmployees.jsx';
+import Home from './pages/Home.jsx';
+import ManageEmployees from './pages/ManageEmployees.jsx'
 import { AuthProvider } from './Context/AuthContext';
 import { MenuProvider } from './Context/MenuContext';
 
@@ -23,7 +24,7 @@ const App = () => {
     <Header/>
     
     <Routes>
-    <Route path="/" element={<Signup />} />
+   <Route path="/" element={<Home />} />
    <Route path="/employee" element={<Dashboard />} />
    <Route path="/admin" element={<Admin />} />
  
@@ -32,7 +33,7 @@ const App = () => {
    <Route path="/dashboard" element={<DashboardMain />} />
    <Route path="/orders" element={<Orderpage />} />
    <Route path="/manage-emp" element={<ManageEmployees/>} />
-  
+   
     </Routes>
     </AuthProvider>
     </MenuProvider>

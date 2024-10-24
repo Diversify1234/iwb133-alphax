@@ -5,14 +5,18 @@ function SubmitButton({buttonTitle}){
             <button 
             style={
                 {
-                    backgroundColor: "var(--green)",
-                    padding: "15px",
                     color: "var(--background-color)",
-                    fontWeight: "bold",
                     width: "100%",
-                    borderRadius: "5px",
-                    border: "none",
-                    fontSize: "var(--font-size-normal)"
+                    fontSize: "var(--font-size-normal)",
+                    background: 'linear-gradient(45deg, var(--green) 30%, var(--green) 30%)',
+                    borderRadius: 3,
+                    border: 0,
+                    height: 48,
+                    padding: '0 30px',
+                    
+                    '&:hover': {
+                        backgroundColor: 'var(--text-primary)',
+                    }
                 }
              }
             type="submit">

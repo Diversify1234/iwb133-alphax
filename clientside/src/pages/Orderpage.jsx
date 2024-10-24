@@ -3,6 +3,7 @@ import { Card, CardContent, Typography, Grid, TextField, Button } from '@mui/mat
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCarrot, faDrumstickBite, faEgg } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import '../index.css'
 
 const OrderPage = () => {
   const [date, setDate] = useState('');
@@ -70,7 +71,13 @@ const OrderPage = () => {
           }}
           style={{ marginRight: '10px' }}
         />
-        <Button variant="contained" color="primary" onClick={handleFetchData}>
+        <Button variant="contained" color="primary" onClick={handleFetchData} 
+        sx={{
+          backgroundColor: 'var(--orange)',
+          '&:hover': {
+                        backgroundColor: 'var(--text-primary)',
+                    }
+          }}>
           Fetch Orders
         </Button>
       </div>

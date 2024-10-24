@@ -38,7 +38,6 @@ const AddMenu = () => {
 
   return (
     <div className="add-menu">
-        <h1>Add items to menu</h1>
        
       <div className="meal-section">
         <h3>Breakfast</h3>
@@ -88,7 +87,7 @@ const AddMenu = () => {
         </Select>
       </div>
 
-      <Button variant="contained" onClick={handleModalOpen}>
+      <Button variant="contained" onClick={handleModalOpen} >
         Add New Food Item
       </Button>
 

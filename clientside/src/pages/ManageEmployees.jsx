@@ -3,6 +3,7 @@ import './ManageEmployees.css'; // Import the CSS file
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEnvelope, faUser, faLock, faTrash } from '@fortawesome/free-solid-svg-icons';
 
+
 const ManageEmployees = () => {
   const [employees, setEmployees] = useState([]);
   const [newEmployee, setNewEmployee] = useState({
