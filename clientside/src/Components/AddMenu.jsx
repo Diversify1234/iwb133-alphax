@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Button, Select, MenuItem, Modal, TextField } from '@mui/material';
 import './AddMenu.css';
 import { useMenu } from '../Context/MenuContext';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const AddMenu = () => {
   const { menu, setMenu } = useMenu();

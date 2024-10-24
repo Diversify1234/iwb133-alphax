@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, Grid, TextField, Button } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCarrot, faDrumstickBite, faEgg } from '@fortawesome/free-solid-svg-icons';
@@ -6,8 +6,21 @@ import axios from 'axios';
 import '../index.css'
 
 const OrderPage = () => {
-  const [date, setDate] = useState('');
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [date, setDate] = useState(getCurrentDate());
   const [mealCounts, setMealCounts] = useState(null);
+
+  useEffect(() => {
+    // Fetch today's order counts when the component loads
+    fetchMealCounts();
+  }, []);
 
   const fetchMealCounts = async () => {
     try {
@@ -28,7 +41,6 @@ const OrderPage = () => {
     fetchMealCounts();
   };
 
-  // Calculate totals for all meal types
   const calculateTotals = () => {
     if (!mealCounts) return { veg: 0, nonveg: 0, egg: 0 };
 
@@ -55,9 +67,7 @@ const OrderPage = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <Typography variant="h4" gutterBottom>
-        Order Counts by Date
-      </Typography>
+     
 
       {/* Date Input */}
       <div style={{ marginBottom: '20px' }}>
@@ -81,6 +91,9 @@ const OrderPage = () => {
           Fetch Orders
         </Button>
       </div>
+      <Typography variant="h5" gutterBottom style={{backgroundColor:"var(--green" , padding:30, borderRadius:10, color:"white"}}>
+        Order Counts for {date}
+      </Typography>
 
       {/* Meal Counts */}
       {mealCounts && (
@@ -172,3 +185,4 @@ const OrderPage = () => {
 };
 
 export default OrderPage;
+
