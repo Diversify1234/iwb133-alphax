@@ -10,8 +10,8 @@ const Menu = () => {
       <h3 className="menu-title">Today's Menu</h3>
 
       <div className="meal-container">
-        <div className="meal-time breakfast-lunch">
-          <div className="meal-section">
+        <div className="meal-time">
+          
             <h4 className="meal-title">Breakfast</h4>
             <ul className="meal-list">
               {menu.breakfast.length > 0 ? (
@@ -21,8 +21,7 @@ const Menu = () => {
               )}
             </ul>
           </div>
-
-          <div className="meal-section">
+          <div className="meal-time">
             <h4 className="meal-title">Lunch</h4>
             <ul className="meal-list">
               {menu.lunch.length > 0 ? (
@@ -31,7 +30,7 @@ const Menu = () => {
                 <li>No items for lunch</li>
               )}
             </ul>
-          </div>
+         
         </div>
 
         <div className="meal-time">
