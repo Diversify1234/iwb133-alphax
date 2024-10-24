@@ -4,6 +4,7 @@ import SubmitButton from './SubmitButton';
 import "../index.css";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Typography } from '@mui/material';
 
 function SignupForm() {
   const navigate = useNavigate();
@@ -34,9 +35,13 @@ function SignupForm() {
 
   return (
     <form className='formCss' onSubmit={handleSubmit}>
-      <h2 className='headingForm'>
-        SignUp
-      </h2>
+      <Typography sx={{
+        color: 'var(--orange)',
+        fontSize: 'var(--font-size-subheading)',
+        fontWeight: 'bold'
+      }}>
+        Sign Up
+      </Typography>
       
       {error && <p className="error-message">{error}</p>}
       
@@ -68,7 +73,7 @@ function SignupForm() {
         onChange={(e) => setPassword(e.target.value)}
       />
       
-      <SubmitButton buttonTitle="SignUp" />
+      <SubmitButton buttonTitle="Sign Up" />
     </form>
   );
 }

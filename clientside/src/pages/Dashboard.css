@@ -3,25 +3,22 @@
     grid-template-columns: 2fr 1fr;
     grid-template-areas: "left right";
     height: 100vh;
-    background-color: var(--green);
 }
 
 .left{
     grid-area: left;
     padding: 20px;
     overflow-y: auto;
-    background-color: var(--green);
     overflow-y: auto;
 }
 
-.right{
-    grid-area: right;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-top-left-radius: 10%;
-    border-bottom-left-radius: 10%;
-    background-color: var(--background-color);
+.right {
+  grid-area: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: linear-gradient(to right, transparent 50%, var(--orange) 50%);
 }
 
 .admin-left{
@@ -36,9 +33,7 @@
 .col2{
     grid-area: col2;
     padding: 15px;
-    border-color: var(--border-color);
-    border-radius: 5%;
-    border: 1px solid var(--border-color);
+    border-radius: 2%;
 }
 
 .col1{
@@ -62,11 +57,57 @@
     padding: 15px;
     overflow-y: auto;
     border-radius: 5%;
-    border: 1px solid var(--border-color);
 }
 
 
-.order-card{
-
-    width:400px;
+/*Home page image animation*/
+.circular-base {
+    width: 80%;
+    height: 65%;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    animation: breathe 4s infinite ease-in-out; /* Breathing effect */
+    position: relative;
+    transform-style: preserve-3d;
+    box-shadow: 
+        inset 0px 4px 10px rgba(0, 0, 0, 0.15),  /* Inner shadow for top-right side */
+        inset 0px -4px 10px rgba(255, 255, 255, 0.7);  /* Inner light shadow for bottom-left side */;
 }
+
+  
+  /* The image that changes */
+  .circular-image {
+    width: 85%;
+    height: 80%;
+    border-radius: 50%;
+    object-fit: cover;
+    position: absolute;
+    opacity: 1;
+    animation: fade-in-out 10s infinite; /* Fade-in and fade-out animation */
+  }
+  
+  /* Breathing effect animation for the circular base */
+  @keyframes breathe {
+    0%, 100% {
+      transform: scale(1); /* Base at normal size */
+    }
+    50% {
+      transform: scale(1.1); /* Base expands slightly */
+    }
+  }
+  
+  /* Fade-in and fade-out  */
+  @keyframes fade-in-out {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 1;
+    }
+  }

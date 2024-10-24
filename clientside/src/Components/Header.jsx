@@ -21,7 +21,7 @@ const GradientButton = styled(Button)(({ theme }) => ({
   padding: '0 30px',
   margin: theme.spacing(1),
   '&:hover': {
-    background: 'linear-gradient(45deg, var(--green) 30%, var(--green) 30%)',
+    background: 'var(--text-primary)',
   },
 }));
 
