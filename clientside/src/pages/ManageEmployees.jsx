@@ -1,78 +1,137 @@
 import React, { useEffect, useState } from 'react';
-import './ManageEmployees.css'; // Import the CSS file
+import './ManageEmployees.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEnvelope, faUser, faLock, faTrash } from '@fortawesome/free-solid-svg-icons';
 
+import Lottie from 'react-lottie';
+import Emp from '../Components/Images/Employees.json';
+
+
 
 const ManageEmployees = () => {
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch('http://localhost:9090/api/employees');
+      if (!response.ok) throw new Error('Failed to fetch employees');
+      
+      const data = await response.json();
+      setEmployees(data);
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+  
+  
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+  
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: Emp,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice"
+    }
+  };
+
   const [employees, setEmployees] = useState([]);
   const [newEmployee, setNewEmployee] = useState({
     mail: '',
     name: '',
     password: ''
   });
-  const [showModal, setShowModal] = useState(false); 
+  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); 
 
- 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const response = await fetch('http://localhost:9090/api/employees');
-      const data = await response.json();
-      setEmployees(data);
+      try {
+        const response = await fetch('http://localhost:9090/api/employees');
+        if (!response.ok) throw new Error('Failed to fetch employees');
+        
+        const data = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
     };
 
     fetchEmployees();
   }, []);
 
- 
   const addEmployee = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:9090/api/employees', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newEmployee),
-    });
+    try {
+        const response = await fetch('http://localhost:9090/api/employees', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newEmployee),
+        });
 
-    if (response.ok) {
-      const addedEmployee = await response.json();
-      setEmployees([...employees, addedEmployee]);
-      setNewEmployee({ mail: '', name: '', password: '' });
-      setShowModal(false); 
-    } else {
-      console.error('Error adding employee');
+        const data = await response.json(); 
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Error adding employee');
+        }
+
+        fetchEmployees();
+
+        setNewEmployee({ mail: '', name: '', password: '' });
+        setShowModal(false);
+    } catch (error) {
+        alert(error.message);
     }
-  };
+};
 
- 
+
+
   const deleteEmployee = async (id) => {
     const confirmed = window.confirm('Are you sure you want to delete this employee?');
     if (confirmed) {
-      const response = await fetch(`http://localhost:9090/api/employees?id=${id}`, {
-        method: 'DELETE',
-      });
+      try {
+        const response = await fetch(`http://localhost:9090/api/employees?id=${id}`, {
+          method: 'DELETE',
+        });
 
-      if (response.ok) {
+        if (!response.ok) throw new Error('Error deleting employee');
+
         setEmployees(employees.filter(employee => employee.id !== id));
-      } else {
-        console.error('Error deleting employee');
+      } catch (error) {
+        setErrorMessage(error.message);
       }
     }
   };
 
-  // Filter out the admin employee
+ 
+  useEffect(() => {
+    if (errorMessage) {
+      alert(errorMessage);
+      setErrorMessage('');
+    }
+  }, [errorMessage]);
+
+ 
   const filteredEmployees = employees.filter(employee => employee.mail !== 'admin@gmail.com');
 
   return (
     <div className="manage-employees">
+      <div>
+        <Lottie 
+          options={defaultOptions}
+          height={100}
+          width={150}
+        />
+      </div>
+      
       <h1>Manage Employees</h1>
 
       <button onClick={() => setShowModal(true)} className="add-button">
         <FontAwesomeIcon icon={faPlus} /> Add Employee
       </button>
 
-      {/* Modal for adding employee */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">

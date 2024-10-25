@@ -12,10 +12,21 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import Lottie from 'react-lottie';
+import Meal from '../Components/Images/meal.json';
 
 
 
 const Admin = () => {
+ 
+    const defaultOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: Meal,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice"
+      }
+    };
   const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
@@ -38,10 +49,17 @@ const Admin = () => {
             <Menu />
           </div>
       </div>
-      <div className='right' style={{
+      <div className='admin-right' style={{
         background: 'linear-gradient(to right, transparent 50%, transparent 50%)',
-        borderLeft: '1px solid var(--text-primary)'
+        borderLeft: '1px solid var(--text-primary)', display:'flex', flexDirection:'column'
       }}>
+         <div>
+      <Lottie 
+	    options={defaultOptions}
+        height={300}
+        width={300}
+      />
+    </div>
          <Calendar/>
       </div>
       <Dialog

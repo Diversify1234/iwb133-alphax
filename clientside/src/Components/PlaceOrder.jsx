@@ -19,7 +19,7 @@ const mealOptions = [
 
 
 
-const PlaceOrder = () => {
+const PlaceOrder = ({Date}) => {
   const { user } = useAuth();
   const [selections, setSelections] = useState({
     1: null,
@@ -32,7 +32,7 @@ const PlaceOrder = () => {
   };
 
   const handlePlaceOrder = async () => {
-    const date = new Date().toISOString().split('T')[0]; 
+    const date = Date;
   
     const orders = Object.entries(selections)
       .filter(([mealtimeId, mealtypeId]) => mealtypeId !== null) 
@@ -60,12 +60,18 @@ const PlaceOrder = () => {
       mx: 'auto',
       mt: 3, 
       p: 2,  
+      boxShadow: '0 6px 20px rgba(0, 0, 0, 0.1)',
       borderRadius: '12px',
+      backgroundColor: '#f9fafb',
     }}>
       <CardContent>
+        <Typography variant="h5" component="h1" gutterBottom sx={{ textAlign: 'center', color: '#0049a2'}}>
+          Place Your Meal Order
+        </Typography>
+
         {mealOptions.map(meal => (
-          <FormControl key={meal.id} component="fieldset" sx={{ mb: 5, borderBottom: '2px solid var(--text-primary)'}}> 
-            <FormLabel component="legend" sx={{ display: 'flex', alignItems: 'center', fontSize: '1.1rem', fontWeight: '500', color: 'var(--text-primary)' }}> {/* Slightly smaller font */}
+          <FormControl key={meal.id} component="fieldset" sx={{ mb: 2 }}> 
+            <FormLabel component="legend" sx={{ display: 'flex', alignItems: 'center', fontSize: '1.1rem', fontWeight: '500', color: '#061C36' }}> {/* Slightly smaller font */}
               <Box sx={{ mr: 0.75 }}>{meal.icon}</Box> {meal.name} 
             </FormLabel>
             <RadioGroup
@@ -77,7 +83,7 @@ const PlaceOrder = () => {
                 <FormControlLabel
                   key={type.id}
                   value={type.id}
-                  control={<Radio sx={{ color: 'var(--text-primary)', '&.Mui-checked': { color: 'var(--orange)' } }} />}
+                  control={<Radio sx={{ color: '#0049a2', '&.Mui-checked': { color: '#007bff' } }} />}
                   label={type.name}
                   sx={{ '& .MuiFormControlLabel-label': { color: '#333', fontSize: '0.95rem' } }}  // Reduced label size
                 />
@@ -91,15 +97,15 @@ const PlaceOrder = () => {
           color="primary"
           fullWidth
           sx={{
-            backgroundColor: 'var(--orange)',
+            backgroundColor: '#007bff',
             color: '#fff',
-            py: 1.2,  
+            py: 1,  
             fontSize: '1.05rem',  
             borderRadius: '10px',  
             textTransform: 'none',
             boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.15)',  
             '&:hover': {
-              backgroundColor: 'var(--text-primary)',
+              backgroundColor: '#0056b3',
             },
           }}
           onClick={handlePlaceOrder}

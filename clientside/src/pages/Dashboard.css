@@ -20,6 +20,12 @@
   height: 100%;
   background: linear-gradient(to right, transparent 50%, var(--orange) 50%);
 }
+.admin-right {
+  grid-area: right;
+  display: flex;
+  height: 100%;
+  background: linear-gradient(to right, transparent 50%, var(--orange) 50%);
+}
 
 .admin-left{
     display: grid;

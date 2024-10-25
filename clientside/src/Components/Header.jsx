@@ -2,8 +2,6 @@ import React, { useContext, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
@@ -24,6 +22,11 @@ const GradientButton = styled(Button)(({ theme }) => ({
     background: 'var(--text-primary)',
   },
 }));
+
+const activeLinkStyle = {
+  color: 'var(--orange)',
+  textDecoration: 'underline',
+};
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -62,18 +65,18 @@ const Header = () => {
             <>
               {isAdmin && (
                 <>
-                  <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: '50px' , fontWeight:'bold'}}>
-                    <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
+                  <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: '50px' , fontWeight:'bold' }}>
+                    <Typography variant="body1" sx={location.pathname === '/dashboard' ? activeLinkStyle : { color: 'var(--text-primary)', cursor: 'pointer' }}>
                       Dashboard
                     </Typography>
                   </Link>
                   <Link to="/orders" style={{ textDecoration: 'none', color: 'inherit', marginRight: '50px', fontWeight:'bold' }}>
-                    <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
+                    <Typography variant="body1" sx={location.pathname === '/orders' ? activeLinkStyle : { color: 'var(--text-primary)', cursor: 'pointer' }}>
                       Orders
                     </Typography>
                   </Link>
                   <Link to="/manage-emp" style={{ textDecoration: 'none', color: 'inherit', marginRight: '50px', fontWeight:'bold' }}>
-                    <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
+                    <Typography variant="body1" sx={location.pathname === '/manage-emp' ? activeLinkStyle : { color: 'var(--text-primary)', cursor: 'pointer' }}>
                       Employees
                     </Typography>
                   </Link>
@@ -90,12 +93,10 @@ const Header = () => {
                     fontSize:'1.5rem',
                     mx: 3,
                     ml:6,
-
                   }}
                 >
                   {user.name}
                 </Typography>
-              
               </div>
               <GradientButton onClick={handleLogout}>Sign Out</GradientButton>
             </>
