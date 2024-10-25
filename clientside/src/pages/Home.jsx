@@ -49,7 +49,7 @@ function Home() {
           <b>Like</b> to <span style={{ color: 'var(--orange)'}}><b> Order Today ?</b></span>
          </Typography>
       </div>
-      <div className='right'>
+      <div className='right1'>
       
           <div className='circular-base'>
           <img
