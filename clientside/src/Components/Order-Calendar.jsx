@@ -29,6 +29,7 @@ const OrderCalendar = () => {
     { id: 3, name: 'Dinner'},
   ];
   
+  
   const getMealTypeName = (id) => mealTypes.find(type => type.id === id)?.name || 'Unknown';
   const getMealOptionName = (id) => mealOptions.find(option => option.id === id)?.name || 'Unknown';
 
@@ -72,6 +73,24 @@ const OrderCalendar = () => {
           });
       };
     
+      const groupOrdersByMealTime = (orders) => {
+        const grouped = orders.reduce((groups, order) => {
+          const mealTime = order.mealTimeName;
+          if (!groups[mealTime]) {
+            groups[mealTime] = [];
+          }
+          groups[mealTime].push(order);
+          return groups;
+        }, {});
+        
+        // Sort grouped orders based on mealOrder
+        return mealOrder.reduce((sortedGroups, mealTime) => {
+          if (grouped[mealTime]) {
+            sortedGroups[mealTime] = grouped[mealTime];
+          }
+          return sortedGroups;
+        }, {});
+      };
       fetchData();  
   
       intervalId = setInterval(fetchData, 2000); 
@@ -171,7 +190,6 @@ const OrderCalendar = () => {
                       <p className="order-date">{order.date}</p>
                       {/* Disable DeleteOrderButton for past dates */}
                       {!isPastDate(selectedDate) && <DeleteOrderButton Orderid={order.id} />}
-
                     </li>
                   ))}
                 </ul>
@@ -182,9 +200,7 @@ const OrderCalendar = () => {
           <div>
             <p>No orders for this date.</p>
             {/* Disable PlaceOrderButton for past dates */}
-           {selectedDate && !isPastDate(selectedDate) && <PlaceOrderButton Date={selectedDate.toLocaleDateString('en-CA')} />}
-
-
+            {selectedDate && !isPastDate(selectedDate) && <PlaceOrderButton Date={selectedDate.toLocaleDateString('en-CA')} />}
           </div>
         )}
       </Modal>
@@ -193,3 +209,4 @@ const OrderCalendar = () => {
 };
 
 export default OrderCalendar;
+

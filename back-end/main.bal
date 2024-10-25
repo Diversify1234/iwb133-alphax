@@ -4,23 +4,6 @@ import ballerina/sql;
 import ballerinax/mysql.driver as _;
 import ballerina/uuid;
 
-final mysql:Client dbClient = check new(
-    host = "localhost",
-    user = "root",
-    password = "Aaishah1234",
-    port = 3306,
-    database = "meal_management"
-);
-
-    @http:ServiceConfig {
-    cors: {
-        allowOrigins: ["http://localhost:5173"],
-        allowHeaders: ["REQUEST_ID", "Content-Type"],
-        exposeHeaders: ["RESPONSE_ID"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        maxAge: 84900
-    }
-}
 
 
 
@@ -474,7 +457,25 @@ ORDER BY
     check caller->respond(mealTimeCounts);
 }
 }
+//my sql client - a dummy local DB added for now
 
+final mysql:Client dbClient = check new(
+    host = "localhost",
+    user = "root",
+    password = "Aaishah1234",
+    port = 3306,
+    database = "meal_management"
+);
+
+    @http:ServiceConfig {
+    cors: {
+        allowOrigins: ["http://localhost:5173"],
+        allowHeaders: ["REQUEST_ID", "Content-Type"],
+        exposeHeaders: ["RESPONSE_ID"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        maxAge: 84900
+    }
+}
 
 
 // Types
