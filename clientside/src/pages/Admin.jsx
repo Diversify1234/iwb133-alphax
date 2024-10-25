@@ -2,7 +2,7 @@ import React from 'react'
 import './Dashboard.css'
 import Calendar from '../Components/Calendar'
 import '../index.css'
-import Menu from '../Components/Menu-admin'
+import Menu from '../Components/Menu'
 import AddMenu from '../Components/AddMenu'
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -41,8 +41,8 @@ const Admin = () => {
     <div className='dashboard'>
       <div className='left col-left'>
           <div className='col1-top'>
-              <Button variant="outlined" onClick={handleClickOpen} sx={{marginTop: '2%', color: 'var(--background-color)', backgroundColor: 'var(--orange)' , marginLeft:'4.8%'}}>
-              <FontAwesomeIcon icon={faPlus} /> Edit Today's Menu
+              <Button variant="outlined" onClick={handleClickOpen} sx={{marginTop: '2%', color: 'var(--background-color)', backgroundColor: 'var(--orange)'}}>
+              <FontAwesomeIcon icon={faPlus} /> Add Today's Menu
               </Button>
           </div>
           <div className='col1-bot'>

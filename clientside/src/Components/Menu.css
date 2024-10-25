@@ -2,22 +2,9 @@
   padding: 1%;
   border-radius: 2%;
   border: none;
-  margin: 20px auto;
+  margin: 30px auto;
   text-align: left;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-  min-width: 470px;
-  width:fit-content;
-}
-
-.menu-card2 {
-  padding: 1%;
-  border-radius: 2%;
-  border: none;
-  margin: 20px auto;
-  text-align: left;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-  min-width: 800px;
-  width:fit-content;
 }
 
 .menu-title {
@@ -36,11 +23,13 @@
   padding: 2%;
 }
 
+
 .meal-time {
-  flex: 1; 
-  min-width: 90px;
+  width: 100%;
   padding: 2%;
 }
+
+
 
 .meal-title {
   font-size: 1.3rem;
@@ -65,11 +54,4 @@
 
 .meal-list li:hover {
   background-color: var(--shadow-color);
-}
-
-/* Media query for smaller screens */
-@media (max-width: 768px) {
-  .meal-container {
-    flex-direction: column; /* Stack columns vertically on smaller screens */
-  }
 }
