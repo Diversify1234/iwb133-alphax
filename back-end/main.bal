@@ -276,6 +276,32 @@ resource function get ordersForEmployee/[int employeeId](http:Caller caller) ret
         }
     }
 
+//get orders made in a day by an emp
+resource function get orderDetailsForEmployeeOnDate(http:Caller caller, http:Request req, string employeeId, string orderDate) returns error? {
+   
+    sql:ParameterizedQuery selectQuery = `SELECT id, employeeId, mealtypeId, mealtimeId, date 
+                                          FROM Order1 WHERE employeeId = ${employeeId} AND date = ${orderDate}`;
+    
+    stream<Order1, sql:Error?> orderStream = dbClient->query(selectQuery);
+
+    Order1[] employeeOrders = [];
+   
+    check from Order1 order1 in orderStream
+        do {
+            employeeOrders.push(order1);
+        };
+
+    http:Response res = new;
+    if employeeOrders.length() > 0 {
+        res.setPayload(employeeOrders);  
+    } else {
+        res.statusCode = 404; 
+        res.setPayload({message: "No orders found for the given employee and date"});
+    }
+
+    check caller->respond(res);
+}
+
     // Get all employees
     resource function get employees() returns Employee[] | error {
         Employee[] employees = [];
