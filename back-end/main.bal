@@ -194,7 +194,7 @@ resource function delete orders(http:Caller caller, http:Request req) returns er
     } else {
     
         http:Response res = new;
-        res.statusCode = 400;  // Bad request
+        res.statusCode = 400;  
         res.setPayload({message: "Missing order ID in query parameters"});
         check caller->respond(res);
     }
@@ -232,15 +232,13 @@ resource function get orders/[int orderId](http:Caller caller) returns error? {
 // Get all orders for a specific employee
 resource function get ordersForEmployee/[int employeeId](http:Caller caller) returns error? {
 
-    // SQL query to get all orders for the given employeeId
+   
     sql:ParameterizedQuery selectQuery = `SELECT id, employeeId, mealtypeId, mealtimeId, date 
                                           FROM Order1 WHERE employeeId = ${employeeId}`;
     stream<Order1, sql:Error?> orderStream = dbClient->query(selectQuery);
 
-    // Create a list to store the orders
     Order1[] employeeOrders = [];
 
-    // Collect all orders from the stream
     check from Order1 order1 in orderStream
         do {
             employeeOrders.push(order1);
@@ -248,33 +246,18 @@ resource function get ordersForEmployee/[int employeeId](http:Caller caller) ret
 
     http:Response res = new;
     if employeeOrders.length() > 0 {
-        // Return the list of orders if found
+       
         res.setPayload(employeeOrders);
     } else {
-        // Return a 404 error if no orders are found for the employee
+        
         res.statusCode = 404;
         res.setPayload({message: "No orders found for the given employee"});
     }
 
-    // Send the response back to the client
     check caller->respond(res);
 }
 
-    // Post a new employee
-    resource function post employees(http:Caller caller, http:Request req) returns error? {
-        json payload = check req.getJsonPayload();
-        NewEmployee newEmployee = check payload.cloneWithType(NewEmployee);
 
-        
-        sql:ParameterizedQuery insertQuery = `INSERT INTO Employee (mail, name, password)
-            VALUES (${newEmployee.mail}, ${newEmployee.name}, ${newEmployee.password})`;
-        var result = dbClient->execute(insertQuery);
-        if result is sql:ExecutionResult {
-            check caller->respond({message: "Employee added successfully"});
-        } else {
-            check caller->respond({message: "Failed to add employee"});
-        }
-    }
 
 //get orders made in a day by an emp
 resource function get orderDetailsForEmployeeOnDate(http:Caller caller, http:Request req, string employeeId, string orderDate) returns error? {
@@ -295,12 +278,44 @@ resource function get orderDetailsForEmployeeOnDate(http:Caller caller, http:Req
     if employeeOrders.length() > 0 {
         res.setPayload(employeeOrders);  
     } else {
-        res.statusCode = 404; 
+        res.statusCode = 200; 
         res.setPayload({message: "No orders found for the given employee and date"});
     }
 
     check caller->respond(res);
 }
+
+// Post a new employee
+resource function post employees(http:Caller caller, http:Request req) returns error? {
+    json payload = check req.getJsonPayload();
+    NewEmployee newEmployee = check payload.cloneWithType(NewEmployee);
+
+ 
+    sql:ParameterizedQuery checkQuery = `SELECT mail FROM Employee WHERE mail = ${newEmployee.mail}`;
+    stream<record {| string mail; |}, sql:Error?> resultStream = dbClient->query(checkQuery);
+
+    var result = resultStream.next();
+    if result is record {| record {| string mail; |} value; |} {
+    
+        check caller->respond({message: "Email already exists"});
+        return;
+    } else if result is error {
+        
+        check caller->respond({message: "Failed to query the database"});
+        return;
+    }
+
+    sql:ParameterizedQuery insertQuery = `INSERT INTO Employee (mail, name, password)
+        VALUES (${newEmployee.mail}, ${newEmployee.name}, ${newEmployee.password})`;
+    var insertResult = dbClient->execute(insertQuery);
+    
+    if insertResult is sql:ExecutionResult {
+        check caller->respond({message: "Employee added successfully"});
+    } else {
+        check caller->respond({message: "Failed to add employee"});
+    }
+}
+
 
     // Get all employees
     resource function get employees() returns Employee[] | error {
