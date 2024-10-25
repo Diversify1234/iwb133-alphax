@@ -1,0 +1,65 @@
+
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .modal-children-content {
+    margin-top: 5px;
+  }
+  
+  .order-details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .order-item {
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .meal-time-title {
+    font-size: 18px;
+    color: var(--orange); 
+    margin-bottom: 5px;
+  }
+  
+  .meal-type {
+    font-size: 16px;
+    color: #061C36;
+    margin-bottom: 3px;
+  }
+  
+  .order-date {
+    font-size: 14px;
+    color: #a0a0a0;
+  }
+  
