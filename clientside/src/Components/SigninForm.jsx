@@ -6,9 +6,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../Context/AuthContext';
 import { Typography } from '@mui/material';
-import {validateEmail,
-       validatePassword} from './Validation';
-
 
 function SigninForm() {
   const navigate = useNavigate();
@@ -18,30 +15,8 @@ function SigninForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const [formError, setFormError] = useState(
-    {
-      email: "",
-      password: ""
-    }
-  )
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const emailValidation = validateEmail(email);
-    const passwordValidation = validatePassword(password);
-
-    if (!emailValidation.isValid || 
-        !passwordValidation.isValid
-    ) {
-      setFormError(
-        {
-          email: emailValidation.Message,
-          password: passwordValidation.Message
-        }
-      );
-      return;
-    }
 
     try {
       const response = await axios.post('http://localhost:9090/api/signin', {
@@ -70,7 +45,7 @@ function SigninForm() {
         Sign In
       </Typography>
       
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error-message">{error}</p>}
       
       <TextField
         label="Email"
@@ -80,8 +55,6 @@ function SigninForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-     {formError.email && <p className="error">{formError.email}</p>}
-
       
       <TextField
         label="Password"
@@ -92,8 +65,7 @@ function SigninForm() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      {formError.password && <p className="error">{formError.password}</p>}
-
+      
       <SubmitButton buttonTitle="Sign In" />
     </form>
   );
