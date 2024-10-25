@@ -229,6 +229,37 @@ resource function get orders/[int orderId](http:Caller caller) returns error? {
 }
 
 
+// Get all orders for a specific employee
+resource function get ordersForEmployee/[int employeeId](http:Caller caller) returns error? {
+
+    // SQL query to get all orders for the given employeeId
+    sql:ParameterizedQuery selectQuery = `SELECT id, employeeId, mealtypeId, mealtimeId, date 
+                                          FROM Order1 WHERE employeeId = ${employeeId}`;
+    stream<Order1, sql:Error?> orderStream = dbClient->query(selectQuery);
+
+    // Create a list to store the orders
+    Order1[] employeeOrders = [];
+
+    // Collect all orders from the stream
+    check from Order1 order1 in orderStream
+        do {
+            employeeOrders.push(order1);
+        };
+
+    http:Response res = new;
+    if employeeOrders.length() > 0 {
+        // Return the list of orders if found
+        res.setPayload(employeeOrders);
+    } else {
+        // Return a 404 error if no orders are found for the employee
+        res.statusCode = 404;
+        res.setPayload({message: "No orders found for the given employee"});
+    }
+
+    // Send the response back to the client
+    check caller->respond(res);
+}
+
     // Post a new employee
     resource function post employees(http:Caller caller, http:Request req) returns error? {
         json payload = check req.getJsonPayload();
