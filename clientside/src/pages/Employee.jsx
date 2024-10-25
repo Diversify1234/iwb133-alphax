@@ -43,7 +43,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className='dashboard'>
+    <div className='dashboard-emp'>
       <div className='left col-left'>
         <div className='col1-top'>
           <h1>Click on a date & Place your order</h1>
@@ -66,7 +66,6 @@ const Dashboard = () => {
       </div>
       
       <div className='right' style={{
-        background: 'linear-gradient(to right, transparent 50%, transparent 50%)',
         borderLeft: '1px solid var(--text-primary)', 
         display: 'flex', 
         flexDirection: "column"
@@ -74,7 +73,7 @@ const Dashboard = () => {
         <div>
           <Lottie options={defaultOptions} height={150} width={300} />
         </div>
-        <div className='col1-bot'>
+        <div >
           <Menu />
         </div>
       </div>

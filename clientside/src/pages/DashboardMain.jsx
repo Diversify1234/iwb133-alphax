@@ -9,7 +9,7 @@ const DashboardMain = () => {
 
  
   if (user) {
-    if (user.mail === 'admin@gmail.com' || user.name === 'admin') {
+    if (user.mail === 'admin@example.com' || user.name === 'admin') {
       return <Admin />; 
     } else {
       return <Employee />; 
