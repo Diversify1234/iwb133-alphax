@@ -10,6 +10,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -29,7 +31,7 @@ const Admin = () => {
       <div className='left col-left'>
           <div className='col1-top'>
               <Button variant="outlined" onClick={handleClickOpen} sx={{marginTop: '2%', color: 'var(--background-color)', backgroundColor: 'var(--orange)'}}>
-                  Add Food
+              <FontAwesomeIcon icon={faPlus} /> Add Today's Menu
               </Button>
           </div>
           <div className='col1-bot'>
@@ -68,7 +70,7 @@ const Admin = () => {
         </DialogContentText>
         </DialogContent>
         <DialogActions>
-        <Button onClick={handleClose} sx={{backgroundColor: 'var(--green)', color: 'var(--background-color)'}}>Cancel</Button>
+        <Button onClick={handleClose} sx={{backgroundColor: 'var(--green)', color: 'var(--background-color)'}}>Done</Button>
         </DialogActions>
     </Dialog>
     </div>

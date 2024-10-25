@@ -62,17 +62,17 @@ const Header = () => {
             <>
               {isAdmin && (
                 <>
-                  <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: '15px' }}>
+                  <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit', marginRight: '50px' , fontWeight:'bold'}}>
                     <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
                       Dashboard
                     </Typography>
                   </Link>
-                  <Link to="/orders" style={{ textDecoration: 'none', color: 'inherit', marginRight: '15px' }}>
+                  <Link to="/orders" style={{ textDecoration: 'none', color: 'inherit', marginRight: '50px', fontWeight:'bold' }}>
                     <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
                       Orders
                     </Typography>
                   </Link>
-                  <Link to="/manage-emp" style={{ textDecoration: 'none', color: 'inherit', marginRight: '15px' }}>
+                  <Link to="/manage-emp" style={{ textDecoration: 'none', color: 'inherit', marginRight: '50px', fontWeight:'bold' }}>
                     <Typography variant="body1" sx={{ color: 'var(--text-primary)', cursor: 'pointer' }}>
                       Employees
                     </Typography>
@@ -84,9 +84,13 @@ const Header = () => {
                   variant="body1"
                   onClick={handleMenu}
                   sx={{
-                    color: 'var(--text-primary)',
+                    color: 'var(--orange)',
                     cursor: 'pointer',
-                    mx: 2,
+                    fontWeight:'bold',
+                    fontSize:'1.5rem',
+                    mx: 3,
+                    ml:6,
+
                   }}
                 >
                   {user.name}
