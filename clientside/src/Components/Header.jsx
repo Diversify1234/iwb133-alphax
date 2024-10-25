@@ -50,7 +50,7 @@ const Header = () => {
   };
 
   // Check if user is admin
-  const isAdmin = user && (user.mail === 'admin@gmail.com' || user.name === 'admin');
+  const isAdmin = user && (user.mail === 'admin@example.com' || user.name === 'admin');
 
   return (
     <AppBar position="static" sx={{ backgroundColor: 'var(--background-color)', boxShadow: '0 4px 6px var(--shadow-color)' }}>

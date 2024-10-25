@@ -3,7 +3,7 @@ import { Card, CardContent, Typography, Grid, TextField, Button } from '@mui/mat
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCarrot, faDrumstickBite, faEgg } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import '../index.css'
+import '../index.css';
 
 const OrderPage = () => {
   const getCurrentDate = () => {
@@ -18,7 +18,6 @@ const OrderPage = () => {
   const [mealCounts, setMealCounts] = useState(null);
 
   useEffect(() => {
-    // Fetch today's order counts when the component loads
     fetchMealCounts();
   }, []);
 
@@ -66,9 +65,7 @@ const OrderPage = () => {
   const totals = calculateTotals();
 
   return (
-    <div style={{ padding: '20px' }}>
-     
-
+    <div style={{ padding:  "40px 100px", backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
       {/* Date Input */}
       <div style={{ marginBottom: '20px' }}>
         <TextField
@@ -79,19 +76,37 @@ const OrderPage = () => {
           InputLabelProps={{
             shrink: true,
           }}
-          style={{ marginRight: '10px' }}
+          style={{ marginRight: '10px', backgroundColor: '#ffffff', borderRadius: '5px' }}
+          variant="outlined"
         />
-        <Button variant="contained" color="primary" onClick={handleFetchData} 
-        sx={{
-          backgroundColor: 'var(--orange)',
-          '&:hover': {
-                        backgroundColor: 'var(--text-primary)',
-                    }
-          }}>
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: '#20b6b0', // Your green color
+            color: 'white',
+            '&:hover': {
+              backgroundColor: '#1b9e9c', // Darker shade on hover
+            },
+            borderRadius: '5px',
+          }}
+          onClick={handleFetchData}
+        >
           Fetch Orders
         </Button>
       </div>
-      <Typography variant="h5" gutterBottom style={{backgroundColor:"var(--green" , padding:30, borderRadius:10, color:"white"}}>
+      <Typography
+        variant="h5"
+        gutterBottom
+        style={{
+          backgroundColor: '#fff', 
+          padding: '20px',
+          borderRadius: '10px',
+          color: "#1b9e9c",
+          textAlign: 'center',
+          fontWeight: 'bold',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+        }}
+      >
         Order Counts for {date}
       </Typography>
 
@@ -100,14 +115,14 @@ const OrderPage = () => {
         <Grid container spacing={3}>
           {Object.keys(mealCounts).map((meal) => (
             <Grid item xs={12} md={4} key={meal}>
-              <Card style={{ padding: '20px', borderRadius: '10px' }}>
+              <Card style={{ padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
                 <CardContent>
                   <Typography variant="h5" gutterBottom>
                     {meal} (Total: {calculateMealTotals(meal)})
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={4}>
-                      <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                      <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px', backgroundColor: '#d6fcfc', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                         <FontAwesomeIcon icon={faCarrot} size="lg" />
                         <Typography variant="body2">Veg</Typography>
                         <Typography variant="h4" style={{ fontWeight: 'bold' }}>
@@ -116,7 +131,7 @@ const OrderPage = () => {
                       </Card>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                      <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                      <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px', backgroundColor: '#ffeddb', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                         <FontAwesomeIcon icon={faDrumstickBite} size="lg" />
                         <Typography variant="body2">Non-Veg</Typography>
                         <Typography variant="h4" style={{ fontWeight: 'bold' }}>
@@ -125,7 +140,7 @@ const OrderPage = () => {
                       </Card>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                      <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                      <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px', backgroundColor: '#fff3e0', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                         <FontAwesomeIcon icon={faEgg} size="lg" />
                         <Typography variant="body2">Egg</Typography>
                         <Typography variant="h4" style={{ fontWeight: 'bold' }}>
@@ -141,14 +156,14 @@ const OrderPage = () => {
 
           {/* Total Counts */}
           <Grid item xs={12}>
-            <Card style={{ padding: '20px', borderRadius: '10px' }}>
+            <Card style={{ padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
               <CardContent>
                 <Typography variant="h5" gutterBottom>
                   Total Counts
                 </Typography>
                 <Grid container spacing={2}>
                   <Grid item xs={4}>
-                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px', backgroundColor: '#d6fcfc', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                       <FontAwesomeIcon icon={faCarrot} size="lg" />
                       <Typography variant="body2">Total Veg</Typography>
                       <Typography variant="h4" style={{ fontWeight: 'bold' }}>
@@ -157,7 +172,7 @@ const OrderPage = () => {
                     </Card>
                   </Grid>
                   <Grid item xs={4}>
-                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px', backgroundColor: '#ffeddb', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                       <FontAwesomeIcon icon={faDrumstickBite} size="lg" />
                       <Typography variant="body2">Total Non-Veg</Typography>
                       <Typography variant="h4" style={{ fontWeight: 'bold' }}>
@@ -166,7 +181,7 @@ const OrderPage = () => {
                     </Card>
                   </Grid>
                   <Grid item xs={4}>
-                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px' }}>
+                    <Card style={{ borderRadius: '10px', textAlign: 'center', padding: '10px', backgroundColor: '#fff3e0', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                       <FontAwesomeIcon icon={faEgg} size="lg" />
                       <Typography variant="body2">Total Egg</Typography>
                       <Typography variant="h4" style={{ fontWeight: 'bold' }}>
@@ -185,4 +200,3 @@ const OrderPage = () => {
 };
 
 export default OrderPage;
-
