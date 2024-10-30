@@ -1,10 +1,18 @@
 import ballerina/http;
-import ballerinax/mysql;
 import ballerina/sql;
-import ballerinax/mysql.driver as _;
 import ballerina/uuid;
+import ballerinax/mysql;
+import ballerinax/mysql.driver as _;
 
-
+@http:ServiceConfig {
+    cors: {
+        allowOrigins: ["http://localhost:5173"],
+        allowHeaders: ["REQUEST_ID", "Content-Type"],
+        exposeHeaders: ["RESPONSE_ID"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        maxAge: 84900
+    }
+}
 
 
 service /api on new http:Listener(9090) {
@@ -457,7 +465,12 @@ ORDER BY
     check caller->respond(mealTimeCounts);
 }
 }
+
+
+
 //my sql client - a dummy local DB added for now
+
+
 
 final mysql:Client dbClient = check new(
     host = "localhost",
@@ -466,93 +479,3 @@ final mysql:Client dbClient = check new(
     port = 3306,
     database = "meal_management"
 );
-
-    @http:ServiceConfig {
-    cors: {
-        allowOrigins: ["http://localhost:5173"],
-        allowHeaders: ["REQUEST_ID", "Content-Type"],
-        exposeHeaders: ["RESPONSE_ID"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        maxAge: 84900
-    }
-}
-
-
-// Types
-
-public type MySession object {
-    public string sessionId;
-    
-};
-
-public type LoginRequest record {|
-    string mail;
-    string password;
-|};
-
-public type UserData record {|
-    readonly int id;
-    string name;
-    string mail;
-|};
-
-public type Employee record {|
-    readonly int id;
-    string mail;
-    string name;
-    string password;
-|};
-
-public type NewEmployee record {|
-    string mail;
-    string name;
-    string password;
-|};
-public type Mealtime record {|
-    readonly int id;
-    string name;
-|};
-
-public type Mealtype record {|
-    readonly int id;
-    string name;
-|};
-
-public type Order1 record {|
-    readonly int id;
-    int employeeId;
-    int mealtypeId;
-    int mealtimeId;
-    string date;
-|};
-
-public type FoodItem record {|
-    readonly int id?;
-    string foodName;
-    string foodType;
-|};
-
-public type NewOrder1 record {|
-    int employeeId;
-    int mealtypeId;
-    int mealtimeId;
-    string date;
-|};
-
-type OrderCreated1 record {|
-    *http:Created;
-    Order1 body;
-|};
-
-
-
-type MealCountRecord record {|
-    int mealtypeId;
-    int count;
-|};
-
-type OrderCountRecord record {|
-    int mealtimeId;
-    int mealtypeId;
-    int count;
-|};
